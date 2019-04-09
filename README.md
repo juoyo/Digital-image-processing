@@ -1,5 +1,6 @@
 # 数字图像处理
 使用Win10 + Visual Studio 2017编写 + OpenCV4
+
 lab1 灰度变换
 1、利用OpenCV读取图像。  
    具体内容：用打开OpenCV打开图像，并在窗口中显示 
