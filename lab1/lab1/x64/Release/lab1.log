@@ -1,0 +1,8 @@
+﻿  lab1.cpp
+lab1.obj : error LNK2001: 无法解析的外部符号 "public: void __cdecl cv::Mat::copyTo(class cv::_OutputArray const &)const " (?copyTo@Mat@cv@@QEBAXAEBV_OutputArray@2@@Z)
+lab1.obj : error LNK2001: 无法解析的外部符号 "class cv::_InputOutputArray const & __cdecl cv::noArray(void)" (?noArray@cv@@YAAEBV_InputOutputArray@1@XZ)
+lab1.obj : error LNK2001: 无法解析的外部符号 "void __cdecl cv::imshow(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &,class cv::_InputArray const &)" (?imshow@cv@@YAXAEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBV_InputArray@1@@Z)
+lab1.obj : error LNK2001: 无法解析的外部符号 "double __cdecl cv::threshold(class cv::_InputArray const &,class cv::_OutputArray const &,double,double,int)" (?threshold@cv@@YANAEBV_InputArray@1@AEBV_OutputArray@1@NNH@Z)
+lab1.obj : error LNK2001: 无法解析的外部符号 "void __cdecl cv::normalize(class cv::_InputArray const &,class cv::_InputOutputArray const &,double,double,int,int,class cv::_InputArray const &)" (?normalize@cv@@YAXAEBV_InputArray@1@AEBV_InputOutputArray@1@NNHH0@Z)
+lab1.obj : error LNK2001: 无法解析的外部符号 "void __cdecl cv::convertScaleAbs(class cv::_InputArray const &,class cv::_OutputArray const &,double,double)" (?convertScaleAbs@cv@@YAXAEBV_InputArray@1@AEBV_OutputArray@1@NN@Z)
+C:\Users\yao\Desktop\USTC有用的\软院课件\研一下\图像\Lab\lab1\x64\Release\lab1.exe : fatal error LNK1120: 6 个无法解析的外部命令
