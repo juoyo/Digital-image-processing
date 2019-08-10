@@ -1,0 +1,12 @@
+﻿  频域滤波.cpp
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab5频域滤波\频域滤波\频域滤波.cpp(123): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab5频域滤波\频域滤波\频域滤波.cpp(208): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=float
+          ]
+  频域滤波.vcxproj -> C:\Users\yao\Desktop\USTC有用的\软院课件\研一下\图像\Lab\lab5频域滤波\x64\Debug\频域滤波.exe
