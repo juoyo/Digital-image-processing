@@ -1,0 +1,81 @@
+#include "pch.h"
+#include <windows.h>
+#include <iostream>
+#include<opencv2/core/core.hpp>
+
+#include<opencv2/highgui/highgui.hpp>
+
+#include<opencv2/imgproc/imgproc.hpp>
+
+using namespace std;
+using namespace cv;
+
+Mat ChangeImgReverse(Mat &img);
+
+int main()
+{
+
+	Mat img = imread("lena.jpg", 0);
+
+	uchar table[256];
+
+	for(int i = 0; i < 256; i++) {
+
+		table[i] = i / 100 * 100;
+
+	}
+
+	imshow("变换前", img);
+
+	Mat img2 = ChangeImgReverse(img);
+
+	imshow("变换后", img2);
+
+	waitKey(0);
+	return 0;
+}
+
+
+Mat ChangeImgReverse(Mat &img) {
+
+	CV_Assert(img.depth() != sizeof(uchar));
+
+	int channels = img.channels();
+
+	int rows = img.rows;
+
+	int cols = img.cols*channels;
+
+	if(img.isContinuous()) {
+
+		cols *= rows;
+
+		rows = 1;
+
+		uchar *p = img.data;
+
+		for(unsigned int i = 0; i < cols*rows; i++) {
+
+			*p++ = 255 - *p;
+
+		}
+
+		return img;
+
+	}
+
+	for(int i = 0; i < rows; i++) {
+
+		uchar *p = img.ptr<uchar>(i);
+
+		for(int j = 0; j < cols; j++) {
+
+			p[j] = 255 - *p;
+
+		}
+
+	}
+
+	return img;
+
+}

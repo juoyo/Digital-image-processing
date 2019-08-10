@@ -1,0 +1,18 @@
+﻿  lab3.cpp
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab3\lab3\lab3.cpp(205): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab3\lab3\lab3.cpp(282): warning C4244: “=”: 从“double”转换到“_Ty”，可能丢失数据
+          with
+          [
+              _Ty=int
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab3\lab3\lab3.cpp(289): warning C4244: “=”: 从“double”转换到“_Ty”，可能丢失数据
+          with
+          [
+              _Ty=int
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab3\lab3\lab3.cpp(296): warning C4244: “=”: 从“double”转换到“_Ty”，可能丢失数据
+          with
+          [
+              _Ty=int
+          ]
+  lab3.vcxproj -> C:\Users\yao\Desktop\USTC有用的\软院课件\研一下\图像\Lab\lab3\x64\Debug\lab3.exe
