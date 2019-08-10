@@ -1,0 +1,53 @@
+﻿  lab4.cpp
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(112): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(155): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(182): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(183): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(184): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(215): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(250): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(292): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(335): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(338): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+c:\users\yao\desktop\ustc有用的\软院课件\研一下\图像\lab\lab4\lab4\lab4.cpp(345): warning C4244: “=”: 从“double”转换到“_Tp”，可能丢失数据
+          with
+          [
+              _Tp=uchar
+          ]
+  lab4.vcxproj -> C:\Users\yao\Desktop\USTC有用的\软院课件\研一下\图像\Lab\lab4\x64\Debug\lab4.exe

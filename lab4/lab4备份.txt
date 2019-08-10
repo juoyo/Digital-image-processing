@@ -1,0 +1,436 @@
+//利用程序给原图像增加椒盐噪声
+//图象模拟添加椒盐噪声是通过随机获取像素点斌那个设置为高亮度点来实现的
+#include "pch.h"
+#include <windows.h>
+#include <iostream>
+#include <cstdlib>
+#include <iostream>
+#include <opencv2\core\core.hpp>
+#include <opencv2\highgui\highgui.hpp>
+#include <opencv2\imgproc\imgproc.hpp>
+#include <opencv2/imgproc/types_c.h>
+
+using namespace cv;
+using namespace std;
+
+Mat SrcImage;
+Mat DstImage;
+Mat GrayImage;
+Mat NoiseImage;
+Mat SaltNoiseImage;
+Mat PepperNoiseImage;
+Mat GaussianNoiseImage;
+
+void toGrayImage()
+{
+	//创建与原图同类型和同大小的矩阵
+	GrayImage.create(SrcImage.size(), SrcImage.type());
+	//将原图转换为灰度图像
+	cvtColor(SrcImage, GrayImage, CV_BGR2GRAY);
+	//imshow("灰度图", GrayImage);
+	waitKey();
+}
+void addSaltNoise(const Mat srcImage, int n)
+{
+	NoiseImage = srcImage.clone();
+	for (int k = 0; k < n; k++)
+	{
+		//随机取值行列
+		int i = rand() % NoiseImage.rows;
+		int j = rand() % NoiseImage.cols;
+		//图像通道判定
+		if (NoiseImage.channels() == 1)
+		{
+			NoiseImage.at<uchar>(i, j) = 255;		//盐噪声
+		}
+		else
+		{
+			NoiseImage.at<Vec3b>(i, j)[0] = 255;
+			NoiseImage.at<Vec3b>(i, j)[1] = 255;
+			NoiseImage.at<Vec3b>(i, j)[2] = 255;
+		}
+	}
+}
+void addPepperNoise(const Mat srcImage, int n)
+{
+	NoiseImage = srcImage.clone();
+	for (int k = 0; k < n; k++)
+	{
+		//随机取值行列
+		int i = rand() % NoiseImage.rows;
+		int j = rand() % NoiseImage.cols;
+		//图像通道判定
+		if (NoiseImage.channels() == 1)
+		{
+			NoiseImage.at<uchar>(i, j) = 0;		//椒噪声
+		}
+		else
+		{
+			NoiseImage.at<Vec3b>(i, j)[0] = 0;
+			NoiseImage.at<Vec3b>(i, j)[1] = 0;
+			NoiseImage.at<Vec3b>(i, j)[2] = 0;
+		}
+	}
+}
+//生成高斯噪声
+double generateGaussianNoise(double mu, double sigma)
+{
+	//定义小值
+	const double epsilon = numeric_limits<double>::min();
+	static double z0, z1;
+	static bool flag = false;
+	flag = !flag;
+	//flag为假构造高斯随机变量X
+	if (!flag)
+		return z1 * sigma + mu;
+	double u1, u2;
+	//构造随机变量
+	do
+	{
+		u1 = rand() * (1.0 / RAND_MAX);
+		u2 = rand() * (1.0 / RAND_MAX);
+	} while (u1 <= epsilon);
+	//flag为真构造高斯随机变量
+	z0 = sqrt(-2.0*log(u1))*cos(2 * CV_PI*u2);
+	z1 = sqrt(-2.0*log(u1))*sin(2 * CV_PI*u2);
+	return z0 * sigma + mu;
+}
+//为图像添加高斯噪声
+void addGaussianNoise(Mat &srcImag)
+{
+	NoiseImage = srcImag.clone();
+	int channels = NoiseImage.channels();
+	int rowsNumber = NoiseImage.rows;
+	int colsNumber = NoiseImage.cols*channels;
+	//判断图像的连续性
+	if (NoiseImage.isContinuous())
+	{
+		colsNumber *= rowsNumber;
+		rowsNumber = 1;
+	}
+	for (int i = 0; i < rowsNumber; i++)
+	{
+		for (int j = 0; j < colsNumber; j++)
+		{
+			//添加高斯噪声
+			int val = NoiseImage.ptr<uchar>(i)[j] +
+				generateGaussianNoise(2, 0.8) * 32;
+			if (val < 0)
+				val = 0;
+			if (val > 255)
+				val = 255;
+			NoiseImage.ptr<uchar>(i)[j] = (uchar)val;
+		}
+	}
+}
+//算术均值滤波器——模板大小5*5
+void ArithmeticMeanFilter(Mat &src)
+{
+	blur(src, DstImage, Size(5, 5), Point(-1, -1));
+	imshow("算术均值滤波", DstImage);
+	waitKey();
+}
+//几何均值滤波器——模板大小5*5
+void GeometryMeanFilter(Mat &src)
+{
+	DstImage = src.clone();
+	int row, col;
+	double mul[3];
+	int mn;
+	if (src.channels() == 1) {
+		//计算每个像素的去噪后color值
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				mul[0] = 1.0;
+				mn = 0;
+				//统计邻域内的几何平均值，邻域大小5*5
+				for (int m = -2; m <= 2; m++) {
+					row = i + m;
+					for (int n = -2; n <= 2; n++) {
+						col = j + n;
+						if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+							mul[0] *= (src.at<uchar>(row, col) == 0 ? 1 : src.at<uchar>(row, col));   //邻域内的非零像素点相乘
+							mn++;
+						}
+					}
+				}
+				//计算1/mn次方
+				//统计成功赋给去噪后图像。
+				DstImage.at<uchar>(i, j) = pow(mul[0], 1.0 / mn);
+			}
+		}
+	}
+	if (src.channels() == 3) {
+		//计算每个像素的去噪后color值
+		for (int i = 0; i < src.rows; i++) {
+			for (int j = 0; j < src.cols; j++) {
+				mul[0] = 1.0;
+				mul[1] = 1.0;
+				mul[2] = 1.0;
+				mn = 0;
+				//统计邻域内的几何平均值，邻域大小5*5
+				for (int m = -2; m <= 2; m++) {
+					row = i + m;
+					for (int n = -2; n <= 2; n++) {
+						col = j + n;
+						if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+							mul[0] *= (src.at<Vec3b>(row, col)[0] == 0 ? 1 : src.at<Vec3b>(row, col)[0]);   //邻域内的非零像素点相乘
+							mul[1] *= (src.at<Vec3b>(row, col)[1] == 0 ? 1 : src.at<Vec3b>(row, col)[1]);   //邻域内的非零像素点相乘
+							mul[2] *= (src.at<Vec3b>(row, col)[2] == 0 ? 1 : src.at<Vec3b>(row, col)[2]);   //邻域内的非零像素点相乘
+							mn++;
+						}
+					}
+				}
+				//计算1/mn次方
+				//统计成功赋给去噪后图像。
+				DstImage.at<Vec3b>(i, j)[0] = pow(mul[0], 1.0 / mn);
+				DstImage.at<Vec3b>(i, j)[1] = pow(mul[1], 1.0 / mn);
+				DstImage.at<Vec3b>(i, j)[2] = pow(mul[2], 1.0 / mn);
+			}
+		}
+	}
+	imshow("几何均值滤波", DstImage);
+	waitKey();
+}
+//谐波均值滤波器——模板大小5*5
+void HarmonicMeanFilter(Mat &src)
+{
+	DstImage = src.clone();
+	int row, col;
+	double sum;
+	int mn;
+	//计算每个像素的去噪后color值
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			sum = 0.0;
+			mn = 0;
+			//统计邻域,5*5模板
+			for (int m = -2; m <= 2; m++) {
+				row = i + m;
+				for (int n = -2; n <= 2; n++) {
+					col = j + n;
+					if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+						sum += (src.at<uchar>(row, col) == 0 ? 255 : 255 / src.at<uchar>(row, col));
+						mn++;
+					}
+				}
+			}
+			//统计成功赋给去噪后图像。
+			DstImage.at<uchar>(i, j) = mn * 255 / sum;
+		}
+	}
+	imshow("谐波均值滤波", DstImage);
+	waitKey();
+}
+//逆谐波均值大小滤波器——模板大小5*5
+void InverseHarmonicMeanFilter(Mat &src)
+{
+	DstImage = src.clone();
+	int row, col;
+	double sum;
+	double sum1;
+	double Q = 2;
+	//计算每个像素的去噪后color值
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			sum = 0.0;
+			sum1 = 0.0;
+			//统计邻域
+			for (int m = -2; m <= 2; m++) {
+				row = i + m;
+				for (int n = -2; n <= 2; n++) {
+					col = j + n;
+					if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+						sum += pow(src.at<uchar>(row, col) / 255, Q + 1);
+						sum1 += pow(src.at<uchar>(row, col) / 255, Q);
+					}
+				}
+			}
+			//计算1/mn次方
+			//统计成功赋给去噪后图像。
+			DstImage.at<uchar>(i, j) = (sum1 == 0 ? 0 : (sum / sum1)) * 255;
+		}
+	}
+	imshow("逆谐波均值滤波", DstImage);
+	waitKey();
+}
+//中值滤波
+void MedianFilter(Mat &src, int window) {
+	medianBlur(src, DstImage, window);
+	imshow("中值滤波", DstImage);
+	waitKey();
+}
+//自适应均值滤波
+void SelfAdaptMeanFilter(Mat &src) {
+	DstImage = src.clone();
+	blur(src, DstImage, Size(7, 7), Point(-1, -1));
+	int row, col;
+	int mn;
+	double Zxy;
+	double Zmed;
+	double Sxy;
+	double Sl;
+	double Sn = 100;
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			Zxy = src.at<uchar>(i, j);
+			Zmed = DstImage.at<uchar>(i, j);
+			Sl = 0;
+			mn = 0;
+			for (int m = -3; m <= 3; m++) {
+				row = i + m;
+				for (int n = -3; n <= 3; n++) {
+					col = j + n;
+					if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+						Sxy = src.at<uchar>(row, col);
+						Sl = Sl + pow(Sxy - Zmed, 2);
+						mn++;
+					}
+				}
+			}
+			Sl = Sl / mn;
+			DstImage.at<uchar>(i, j) = Zxy - Sn / Sl * (Zxy - Zmed);
+		}
+	}
+	imshow("自适应均值滤波", DstImage);
+	waitKey();
+}
+//自适应中值滤波
+void SelfAdaptMedianFilter(Mat &src) {
+	DstImage = src.clone();
+	int row, col;
+	double Zmin, Zmax, Zmed, Zxy, Smax = 7;
+	int wsize;
+	//计算每个像素的去噪后color值
+	for (int i = 0; i < src.rows; i++) {
+		for (int j = 0; j < src.cols; j++) {
+			//统计邻域
+			wsize = 1;
+			while (wsize <= 3) {
+				Zmin = 255.0;
+				Zmax = 0.0;
+				Zmed = 0.0;
+				Zxy = src.at<uchar>(i, j);
+				int mn = 0;
+				for (int m = -wsize; m <= wsize; m++) {
+					row = i + m;
+					for (int n = -wsize; n <= wsize; n++) {
+						col = j + n;
+						if (row >= 0 && row < src.rows && col >= 0 && col < src.cols) {
+							double s = src.at<uchar>(row, col);
+							if (s > Zmax) {
+								Zmax = s;
+							}
+							if (s < Zmin) {
+								Zmin = s;
+							}
+							Zmed = Zmed + s;
+							mn++;
+						}
+					}
+				}
+				Zmed = Zmed / mn;
+				if ((Zmed - Zmin) > 0 && (Zmed - Zmax) < 0) {
+					if ((Zxy - Zmin) > 0 && (Zxy - Zmax) < 0) {
+						DstImage.at<uchar>(i, j) = Zxy;
+					}
+					else {
+						DstImage.at<uchar>(i, j) = Zmed;
+					}
+					break;
+				}
+				else {
+					wsize++;
+					if (wsize > 3) {
+						DstImage.at<uchar>(i, j) = Zmed;
+						break;
+					}
+				}
+			}
+		}
+	}
+	imshow("自适应中值滤波", DstImage);
+	waitKey();
+}
+int main()
+{
+	SrcImage = imread("lena.jpg");
+	if (!SrcImage.data)
+	{
+		cout << "读入图像有误！" << endl;
+		system("pause");
+		return -1;
+	}
+	toGrayImage();
+	while (1) {
+		cout << "请选择想进行的第一步操作：" << endl;
+		cout << "1.为图像添加盐噪声" << endl;
+		cout << "2.为图像添加胡椒噪声" << endl;
+		cout << "3.为图像添加椒盐噪声" << endl;
+		cout << "4.为图像添加高斯噪声" << endl;
+		cout << "5.为彩色图像添加盐噪声" << endl;
+		int noise;
+		cin >> noise;
+		if (noise == 1) {
+			addSaltNoise(GrayImage, 300);
+		}
+		else if (noise == 2) {
+			addPepperNoise(GrayImage, 300);
+		}
+		else if (noise == 3) {
+			addSaltNoise(GrayImage, 300);
+			addPepperNoise(NoiseImage, 300);
+		}
+		else if (noise == 4) {
+			addGaussianNoise(GrayImage);
+		}
+		else if (noise == 5) {
+			addSaltNoise(SrcImage, 300);
+		}
+		else continue;
+		imshow("添加噪声的图像", NoiseImage);
+		waitKey();
+		while (1) {
+			cout << "请选择想进行的第二步操作：" << endl;
+			cout << "1.算术均值滤波5*5" << endl;
+			cout << "2.几何均值滤波5*5" << endl;
+			cout << "3.谐波均值滤波5*5" << endl;
+			cout << "4.逆谐波均值滤波5*5" << endl;
+			cout << "5.中值滤波5*5" << endl;
+			cout << "6.中值滤波9*9" << endl;
+			cout << "7.自适应均值滤波7*7" << endl;
+			cout << "8.自适应中值滤波7*7" << endl;
+			cout << "9.重新添加噪声" << endl;
+			int type;
+			cin >> type;
+			if (type == 1) {
+				ArithmeticMeanFilter(NoiseImage);
+			}
+			else if (type == 2) {
+				GeometryMeanFilter(NoiseImage);
+			}
+			else if (type == 3) {
+				HarmonicMeanFilter(NoiseImage);
+			}
+			else if (type == 4) {
+				InverseHarmonicMeanFilter(NoiseImage);
+			}
+			else if (type == 5) {
+				MedianFilter(NoiseImage, 5);
+			}
+			else if (type == 6) {
+				MedianFilter(NoiseImage, 9);
+			}
+			else if (type == 7) {
+				SelfAdaptMeanFilter(NoiseImage);
+			}
+			else if (type == 8) {
+				SelfAdaptMedianFilter(NoiseImage);
+			}
+			else if (type == 9) break;
+			else continue;
+		}
+	}
+	return 0;
+}
+
